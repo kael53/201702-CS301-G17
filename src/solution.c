@@ -31,7 +31,8 @@ void calculateScore(Solution *solution) {
 
 	for (i = 0; i < solution->size; i += 2)
 		if ((solution->literals[abs(solution->clauses[i]) - 1] ^ (solution->clauses[i] < 0)) &&
-			(solution->literals[abs(solution->clauses[i + 1]) - 1] ^ (solution->clauses[i + 1] < 0)))
+			((solution->clauses[i + 1] == 0) ||
+				(solution->literals[abs(solution->clauses[i + 1]) - 1] ^ (solution->clauses[i + 1] < 0))))
 			solution->score++;
 }
 
