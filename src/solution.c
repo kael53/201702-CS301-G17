@@ -1,28 +1,27 @@
 #include "solution.h"
 
-Solution *generateSolution(char *clauses, char *literals) {
+Solution *generateSolution(char *clauses, int cSize, char *literals, int lSize) {
 	Solution *solution = (Solution *) malloc(sizeof(Solution));
 
-	int size = strlen(clauses) + 1;
-	solution->clauses = (char *) malloc(sizeof(char) * size);
-	memcpy(solution->clauses, clauses, size);
+	solution->clauses = (char *) malloc(sizeof(char) * cSize);
+	memcpy(solution->clauses, clauses, cSize);
 
-	solution->size = size - 1;
+	solution->size = cSize;
 
-	size = strlen(literals) + 1;
-	solution->literals = (char *) malloc(sizeof(char) * size);
-	memcpy(solution->literals, literals, size);
+	solution->literals = (char *) malloc(sizeof(char) * lSize);
+	memcpy(solution->literals, literals, lSize);
 
 	solution->score = -1;
 
 	return solution;
 }
 
-void destroySolution(Solution *solution) {
-	free(solution->clauses);
-	free(solution->literals);
-	free(solution);
-	solution = 0;
+void destroySolution(Solution **solution) {
+	if (!*solution) return;
+	free((*solution)->clauses);
+	free((*solution)->literals);
+	free(*solution);
+	*solution = 0;
 }
 
 void calculateScore(Solution *solution) {
@@ -30,8 +29,8 @@ void calculateScore(Solution *solution) {
 	int i;
 
 	for (i = 0; i < solution->size; i += 2)
-		if ((solution->literals[abs(solution->clauses[i]) - 1] ^ (solution->clauses[i] < 0)) &&
-			((solution->clauses[i + 1] == 0) ||
+		if ((solution->literals[abs(solution->clauses[i]) - 1] ^ (solution->clauses[i] < 0)) ||
+			(solution->clauses[i + 1] &&
 				(solution->literals[abs(solution->clauses[i + 1]) - 1] ^ (solution->clauses[i + 1] < 0))))
 			solution->score++;
 }
@@ -41,10 +40,15 @@ void printSolution(Solution *solution) {
 	if (solution->score == -1)
 		calculateScore(solution);
 	printf("Score:\t%d\n", solution->score);
-	printf("Solution:\n");
+
+	printf("Solution:\t");
 
 	for (i = 0; i < solution->size; i += 2)
-		printf("(%d ^ %d)%s", solution->literals[abs(solution->clauses[i]) - 1],
-					solution->literals[abs(solution->clauses[i + 1]) - 1],
-						i == solution->size - 1 ? "\n" : " V ");
+		if (solution->clauses[i + 1])
+			printf("(%d V %d)%s", solution->literals[abs(solution->clauses[i]) - 1] ^ (solution->clauses[i] < 0) ,
+						solution->literals[abs(solution->clauses[i + 1]) - 1] ^ (solution->clauses[i + 1] < 0),
+							i == solution->size - 2 ? "\n" : " ^ ");
+		else
+			printf("%d%s", solution->literals[abs(solution->clauses[i]) - 1] ^ (solution->clauses[i] < 0),
+						i == solution->size - 2 ? "\n" : " ^ ");
 }
