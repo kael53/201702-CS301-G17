@@ -4,16 +4,38 @@ Solution *generateSolution(char *clauses, int cSize, char *literals, int lSize) 
 	Solution *solution = (Solution *) malloc(sizeof(Solution));
 
 	solution->clauses = (char *) malloc(sizeof(char) * cSize);
-	memcpy(solution->clauses, clauses, cSize);
+	memcpy(solution->clauses, clauses, sizeof(char) * cSize);
 
-	solution->size = cSize;
+	solution->cSize = cSize;
 
 	solution->literals = (char *) malloc(sizeof(char) * lSize);
-	memcpy(solution->literals, literals, lSize);
+	memcpy(solution->literals, literals, sizeof(char) * lSize);
 
+	solution->lSize = lSize;
 	solution->score = -1;
 
 	return solution;
+}
+
+Solution *generateEmptySolution(char *clauses, int cSize, int lSize) {
+	Solution *solution = (Solution *) malloc(sizeof(Solution));
+
+	solution->clauses = (char *) malloc(sizeof(char) * cSize);
+	memcpy(solution->clauses, clauses, sizeof(char) * cSize);
+
+	solution->cSize = cSize;
+
+	solution->literals = (char *) malloc(sizeof(char) * lSize);
+	memset(solution->literals, 0, sizeof(char) * lSize);
+
+	solution->lSize = lSize;
+	solution->score = -1;
+
+	return solution;
+}
+
+Solution *copySolution(Solution *solution) {
+	return generateSolution(solution->clauses, solution->cSize, solution->literals, solution->lSize);
 }
 
 void destroySolution(Solution **solution) {
@@ -28,7 +50,7 @@ void calculateScore(Solution *solution) {
 	solution->score = 0;
 	int i;
 
-	for (i = 0; i < solution->size; i += 2)
+	for (i = 0; i < solution->cSize; i += 2)
 		if ((solution->literals[abs(solution->clauses[i]) - 1] ^ (solution->clauses[i] < 0)) ||
 			(solution->clauses[i + 1] &&
 				(solution->literals[abs(solution->clauses[i + 1]) - 1] ^ (solution->clauses[i + 1] < 0))))
@@ -41,14 +63,26 @@ void printSolution(Solution *solution) {
 		calculateScore(solution);
 	printf("Score:\t%d\n", solution->score);
 
+	printf("Formula:\t");
+
+	for (i = 0; i < solution->cSize; i += 2)
+		if (solution->clauses[i + 1])
+			printf("(%d V %d)%s", solution->clauses[i], solution->clauses[i + 1],
+							i == solution->cSize - 2 ? "\n" : " ^ ");
+		else
+			printf("%d%s", solution->clauses[i],
+						i == solution->cSize - 2 ? "\n" : " ^ ");
+
+	printf("Literals:\t");
+
+	for (i = 0; i < solution->lSize; i++)
+		printf("%d(%d)%s", i, solution->literals[i], i == solution->lSize - 1 ? "\n" : " ");
+
 	printf("Solution:\t");
 
-	for (i = 0; i < solution->size; i += 2)
-		if (solution->clauses[i + 1])
-			printf("(%d V %d)%s", solution->literals[abs(solution->clauses[i]) - 1] ^ (solution->clauses[i] < 0) ,
-						solution->literals[abs(solution->clauses[i + 1]) - 1] ^ (solution->clauses[i + 1] < 0),
-							i == solution->size - 2 ? "\n" : " ^ ");
-		else
-			printf("%d%s", solution->literals[abs(solution->clauses[i]) - 1] ^ (solution->clauses[i] < 0),
-						i == solution->size - 2 ? "\n" : " ^ ");
+	for (i = 0; i < solution->cSize; i += 2)
+		printf("%d%s", (solution->literals[abs(solution->clauses[i]) - 1] ^ (solution->clauses[i] < 0)) ||
+                        		(solution->clauses[i + 1] &&
+                                		(solution->literals[abs(solution->clauses[i + 1]) - 1] ^ (solution->clauses[i + 1] < 0))),
+							i == solution->cSize - 2 ? "\n" : " ^ ");
 }

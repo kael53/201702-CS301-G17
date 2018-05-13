@@ -7,10 +7,14 @@ typedef struct {
 	char	*clauses; //This has pairs of literal indices in it. (1-based indices, eg. [1, -5, 2, -3, 4, 0] ==> (1 V -5) ^ (2 V -3) ^ 4)
 	char	*literals; //This has the assigned values of the literals. (0 or 1, eg. [1, 1, 0, 1, 0])
 	int	score; //This shows how many clauses are satisfied with this solution.
-	int	size; //Size of the clauses array.
+	int	cSize; //Size of the clauses array.
+	int	lSize; //Size of the literals array.
 } Solution;
 
 Solution *generateSolution(char *clauses, int cSize, char *literals, int lSize);
+Solution *generateEmptySolution(char *clauses, int cSize, int lSize);
+
+Solution *copySolution(Solution *solution);
 
 void destroySolution(Solution **solution);
 

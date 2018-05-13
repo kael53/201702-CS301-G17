@@ -6,7 +6,17 @@ int main(int argc, char **argv) {
 
 	Solver *solver = generateSolver(clauses, 10, 9);
 
+	printf("Brute-Force\n");
+
 	printSolution(solve(solver));
+
+	printf("\nHillClimbing\n");
+
+	printSolution(solveWithHC(solver));
+
+	printf("\nSimulatedAnnealing\n");
+
+	printSolution(solveWithSA(solver, 0.0001, 0.9, 100));
 
 	destroySolver(&solver);
 
