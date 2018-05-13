@@ -20,7 +20,7 @@ void destroySolver(Solver **solver) {
 }
 
 Solution *solve(Solver *solver) {
-        int i, j, k;
+        int i, j;
         char *literals = (char *) malloc(sizeof(char) * (solver->literals + 1));
         memset(literals, 0, sizeof(char) * (solver->literals + 1));
 
