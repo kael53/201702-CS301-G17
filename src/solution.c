@@ -76,7 +76,7 @@ void printSolution(Solution *solution) {
 	printf("Literals:\t");
 
 	for (i = 0; i < solution->lSize; i++)
-		printf("%d(%d)%s", i, solution->literals[i], i == solution->lSize - 1 ? "\n" : " ");
+		printf("%d(%d)%s", i + 1, solution->literals[i], i == solution->lSize - 1 ? "\n" : " ");
 
 	printf("Solution:\t");
 
