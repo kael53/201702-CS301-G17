@@ -1,15 +1,15 @@
 #include "solution.h"
 
-Solution *generateSolution(char *clauses, int cSize, char *literals, int lSize) {
+Solution *generateSolution(int *clauses, int cSize, int *literals, int lSize) {
 	Solution *solution = (Solution *) malloc(sizeof(Solution));
 
-	solution->clauses = (char *) malloc(sizeof(char) * cSize);
-	memcpy(solution->clauses, clauses, sizeof(char) * cSize);
+	solution->clauses = (int *) malloc(sizeof(int) * cSize);
+	memcpy(solution->clauses, clauses, sizeof(int) * cSize);
 
 	solution->cSize = cSize;
 
-	solution->literals = (char *) malloc(sizeof(char) * lSize);
-	memcpy(solution->literals, literals, sizeof(char) * lSize);
+	solution->literals = (int *) malloc(sizeof(int) * lSize);
+	memcpy(solution->literals, literals, sizeof(int) * lSize);
 
 	solution->lSize = lSize;
 	solution->score = -1;
@@ -17,16 +17,16 @@ Solution *generateSolution(char *clauses, int cSize, char *literals, int lSize) 
 	return solution;
 }
 
-Solution *generateEmptySolution(char *clauses, int cSize, int lSize) {
+Solution *generateEmptySolution(int *clauses, int cSize, int lSize) {
 	Solution *solution = (Solution *) malloc(sizeof(Solution));
 
-	solution->clauses = (char *) malloc(sizeof(char) * cSize);
-	memcpy(solution->clauses, clauses, sizeof(char) * cSize);
+	solution->clauses = (int *) malloc(sizeof(int) * cSize);
+	memcpy(solution->clauses, clauses, sizeof(int) * cSize);
 
 	solution->cSize = cSize;
 
-	solution->literals = (char *) malloc(sizeof(char) * lSize);
-	memset(solution->literals, 0, sizeof(char) * lSize);
+	solution->literals = (int *) malloc(sizeof(int) * lSize);
+	memset(solution->literals, 0, sizeof(int) * lSize);
 
 	solution->lSize = lSize;
 	solution->score = -1;
@@ -61,8 +61,8 @@ void printSolution(Solution *solution) {
 	int i;
 	if (solution->score == -1)
 		calculateScore(solution);
-	printf("Score:\t%d\n", solution->score);
-
+	printf("Score is %d\n", solution->score);
+	
 	printf("Formula:\t");
 
 	for (i = 0; i < solution->cSize; i += 2)

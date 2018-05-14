@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 
 	printf("\nSimulatedAnnealing\n");
 
-	printSolution(solveWithSA(solver, 0.0001, 0.9, 100));
+	printSolution(solveWithSA(solver, 0.0001, 2, 100)); //parametreleri ayarla
 
 	destroySolver(&solver);
 

@@ -1,12 +1,13 @@
 #include "solver.h"
+#include <math.h>
 
-Solver *generateSolver(char *clauses, int cSize, int literals) {
+Solver *generateSolver(int *clauses, int cSize, int numLiterals) {
         Solver *solver = (Solver *) malloc(sizeof(Solver));
 
-        solver->clauses = (char *) malloc(sizeof(char) * cSize);
-        memcpy(solver->clauses, clauses, sizeof(char) * cSize);
+        solver->clauses = (int *) malloc(sizeof(int) * cSize);
+        memcpy(solver->clauses, clauses, sizeof(int) * cSize);
 
-        solver->literals = literals;
+        solver->numLiterals = numLiterals;
         solver->size = cSize;
 
         return solver;
@@ -20,25 +21,25 @@ void destroySolver(Solver **solver) {
 }
 
 Solution *solve(Solver *solver) {
-        int i, j;
-        char *literals = (char *) malloc(sizeof(char) * (solver->literals + 1));
-        memset(literals, 0, sizeof(char) * (solver->literals + 1));
+        unsigned long long int i, j;
+		int *literals = (int *) malloc(sizeof(int) * (solver->numLiterals + 1));
+        memset(literals, 0, sizeof(int) * (solver->numLiterals + 1));
 
-	int power = pow(2, solver->literals);
+	unsigned long long int power = pow(2, solver->numLiterals);
 	Solution *curSol, *bestSol = 0;
 	for (i = 0; i < power; i++) {
-		curSol = generateSolution(solver->clauses, solver->size, literals, solver->literals);
+		curSol = generateSolution(solver->clauses, solver->size, literals, solver->numLiterals);
 		calculateScore(curSol);
 		if (!bestSol || curSol->score > bestSol->score) {
 			destroySolution(&bestSol);
 			bestSol = curSol;
 		} else destroySolution(&curSol);
-		if (literals[solver->literals - 1]) {
-			for (j = solver->literals - 2; j >= 0 && literals[j]; j--)
+		if (literals[solver->numLiterals - 1]) {
+			for (j = solver->numLiterals - 2; j >= 0 && literals[j]; j--)
 				literals[j] ^= 1;
 			literals[j] ^= 1;
 		}
-		literals[solver->literals - 1] ^= 1;
+		literals[solver->numLiterals - 1] ^= 1;
 	}
 
         return bestSol;
@@ -47,9 +48,9 @@ Solution *solve(Solver *solver) {
 Solution *solveWithHC(Solver *solver) {
 	int i, oldScore = -1;
 
-	Solution *solution = generateEmptySolution(solver->clauses, solver->size, solver->literals);
+	Solution *solution = generateEmptySolution(solver->clauses, solver->size, solver->numLiterals);
 	calculateScore(solution);
-	while (oldScore != solution->score && (oldScore = solution->score) < solver->literals) {
+	while (oldScore != solution->score && (oldScore = solution->score) < solver->numLiterals) {
 		for (i = 0; i < solution->lSize; i++) {
 			int tempScore = solution->score;
 
@@ -66,15 +67,19 @@ Solution *solveWithHC(Solver *solver) {
 	return solution;
 }
 
-Solution *solveWithSA(Solver *solver, const double Tmin, const double alpha, const int nOfIter) {
+Solution *solveWithSA(Solver *solver, const double T0, const double Tmin, const double alpha, const int nOfIter) {
 	int i;
-	double T;
+	double T = T0;
 
 	srand((unsigned) time(0));
 
-	Solution *curSol = generateEmptySolution(solver->clauses, solver->size, solver->literals), *bestSol = 0;
+	Solution *curSol = generateEmptySolution(solver->clauses, solver->size, solver->numLiterals), *bestSol = 0;
 	calculateScore(curSol);
-	for (T = 1.0; T > Tmin; T *= alpha) {
+	if (!(solver->size > 0 && solver->numLiterals > 0)) {
+		return curSol;
+	}
+
+	//for (T = T0; T > Tmin; T *= alpha) {
 		for (i = 0; i < nOfIter; i++) {
 			if (!bestSol || curSol->score > bestSol->score) {
 				destroySolution(&bestSol);
@@ -82,15 +87,19 @@ Solution *solveWithSA(Solver *solver, const double Tmin, const double alpha, con
 			}
 
 			Solution *newSol = copySolution(curSol);
-			newSol->literals[rand() % solver->literals] ^= 1;
+			newSol->literals[rand() % solver->numLiterals] ^= 1;
 			calculateScore(newSol);
 			if (exp((curSol->score - newSol->score) / T) * 100 > (rand() % 101)) {
 				if (bestSol != curSol)
 					destroySolution(&curSol);
 				curSol = newSol;
 			}
+			T *= alpha;
 		}
-	}
+
+		/*if (2 * bestSol->score == solver->size)
+			break;*/
+	//}
 
 	if (bestSol != curSol)
 		destroySolution(&curSol);
