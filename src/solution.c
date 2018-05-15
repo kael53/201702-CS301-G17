@@ -1,6 +1,6 @@
 #include "solution.h"
 
-Solution *generateSolution(int *clauses, int cSize, int *literals, int lSize) {
+Solution *generateSolution(int *clauses, int cSize, char *literals, int lSize) {
 	Solution *solution = (Solution *) malloc(sizeof(Solution));
 
 	solution->clauses = (int *) malloc(sizeof(int) * cSize);
@@ -8,8 +8,8 @@ Solution *generateSolution(int *clauses, int cSize, int *literals, int lSize) {
 
 	solution->cSize = cSize;
 
-	solution->literals = (int *) malloc(sizeof(int) * lSize);
-	memcpy(solution->literals, literals, sizeof(int) * lSize);
+	solution->literals = (char *) malloc(sizeof(char) * lSize);
+	memcpy(solution->literals, literals, sizeof(char) * lSize);
 
 	solution->lSize = lSize;
 	solution->score = -1;
@@ -25,8 +25,8 @@ Solution *generateEmptySolution(int *clauses, int cSize, int lSize) {
 
 	solution->cSize = cSize;
 
-	solution->literals = (int *) malloc(sizeof(int) * lSize);
-	memset(solution->literals, 0, sizeof(int) * lSize);
+	solution->literals = (char *) malloc(sizeof(char) * lSize);
+	memset(solution->literals, 0, sizeof(char) * lSize);
 
 	solution->lSize = lSize;
 	solution->score = -1;
@@ -50,7 +50,7 @@ void calculateScore(Solution *solution) {
 	solution->score = 0;
 	int i;
 
-	for (i = 0; i < solution->cSize; i += 2)
+	for (i = 0; i < solution->cSize - 1; i += 2)
 		if ((solution->literals[abs(solution->clauses[i]) - 1] ^ (solution->clauses[i] < 0)) ||
 			(solution->clauses[i + 1] &&
 				(solution->literals[abs(solution->clauses[i + 1]) - 1] ^ (solution->clauses[i + 1] < 0))))
@@ -62,10 +62,10 @@ void printSolution(Solution *solution) {
 	if (solution->score == -1)
 		calculateScore(solution);
 	printf("Score is %d\n", solution->score);
-	
+
 	printf("Formula:\t");
 
-	for (i = 0; i < solution->cSize; i += 2)
+	for (i = 0; i < solution->cSize - 1; i += 2)
 		if (solution->clauses[i + 1])
 			printf("(%d V %d)%s", solution->clauses[i], solution->clauses[i + 1],
 							i == solution->cSize - 2 ? "\n" : " ^ ");
@@ -80,7 +80,7 @@ void printSolution(Solution *solution) {
 
 	printf("Solution:\t");
 
-	for (i = 0; i < solution->cSize; i += 2)
+	for (i = 0; i < solution->cSize - 1; i += 2)
 		printf("%d%s", (solution->literals[abs(solution->clauses[i]) - 1] ^ (solution->clauses[i] < 0)) ||
                         		(solution->clauses[i + 1] &&
                                 		(solution->literals[abs(solution->clauses[i + 1]) - 1] ^ (solution->clauses[i + 1] < 0))),

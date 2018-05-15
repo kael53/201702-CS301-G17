@@ -21,11 +21,11 @@ void destroySolver(Solver **solver) {
 }
 
 Solution *solve(Solver *solver) {
-        unsigned long long int i, j;
-		int *literals = (int *) malloc(sizeof(int) * (solver->numLiterals + 1));
-        memset(literals, 0, sizeof(int) * (solver->numLiterals + 1));
+        long long int i, j;
+	char *literals = (char *) malloc(sizeof(char) * solver->numLiterals);
+        memset(literals, 0, sizeof(char) * solver->numLiterals);
 
-	unsigned long long int power = pow(2, solver->numLiterals);
+	long long int power = pow(2, solver->numLiterals);
 	Solution *curSol, *bestSol = 0;
 	for (i = 0; i < power; i++) {
 		curSol = generateSolution(solver->clauses, solver->size, literals, solver->numLiterals);
@@ -35,9 +35,10 @@ Solution *solve(Solver *solver) {
 			bestSol = curSol;
 		} else destroySolution(&curSol);
 		if (literals[solver->numLiterals - 1]) {
-			for (j = solver->numLiterals - 2; j >= 0 && literals[j]; j--)
+			for (j = solver->numLiterals - 2; j >= 0 && literals[j]; --j)
 				literals[j] ^= 1;
-			literals[j] ^= 1;
+			if (j >= 0)
+				literals[j] ^= 1;
 		}
 		literals[solver->numLiterals - 1] ^= 1;
 	}

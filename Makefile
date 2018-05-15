@@ -1,10 +1,10 @@
 TARGET   = max2-sat
 
-CC       = gcc
-CFLAGS   = -std=c99 -Wall -I.
+CC       = gcc-7
+CFLAGS   = -std=c99 -Wall -I. -fopenmp -O3
 
-LINKER   = gcc
-LFLAGS   = -Wall -I. -lm
+LINKER   = gcc-7
+LFLAGS   = -Wall -I. -lm -fopenmp -O3
 
 SRCDIR   = src
 OBJDIR   = obj
