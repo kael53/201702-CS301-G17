@@ -21,4 +21,6 @@ void destroySolution(Solution **solution);
 void calculateScore(Solution *solution);
 
 void printSolution(Solution *solution);
+
+void filePrintScore(Solution *solution, FILE *f);
 #endif

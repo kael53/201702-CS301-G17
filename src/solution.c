@@ -85,4 +85,13 @@ void printSolution(Solution *solution) {
                         		(solution->clauses[i + 1] &&
                                 		(solution->literals[abs(solution->clauses[i + 1]) - 1] ^ (solution->clauses[i + 1] < 0))),
 							i == solution->cSize - 2 ? "\n" : " ^ ");
+
+	//destroySolution(&solution); //?
+}
+
+void filePrintScore(Solution *solution, FILE *f) {
+	if (solution->score == -1)
+		calculateScore(solution);
+	fprintf(f, "%d,", solution->score);
+	//destroySolution(&solution); //?
 }
